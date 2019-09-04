@@ -2,21 +2,21 @@
 	Model		: adc.c
 	Description	: ADC Head file
 	Author		: harry
-	Create Time	: 2019.1.3
-	Version ID  : V1
+	Create Time	: 2019.9.4
+	Version ID  : V1  
 	Mcu			: EM88F715N 20PIN
 ---------------------------------------------------------------------------------------*/
 #include "app.h"
 
-	u8 pid_dataup;	//PIDÊı¾İ¸üĞÂÖÜÆÚ pid_dataup*8ms
-  signed   short en=0;		// µ±Ç°Îó²î
-  signed   short en1=0;		// ÉÏ´ÎÎó²î
-  signed   short en2=0;		// ÉÏÉÏ´ÎÎó²î
-  signed   short now_out=0;	//µ±Ç°PIDÊä³ö
-  signed   short pre_out;	//ÉÏÒ»´ÎPIDÊä³ö	
-  float kp;	//±ÈÀıÏµÊı	
-  float ki;	//»ı·ÖÏµÊı
-  float kd;	//Î¢·ÖÏµÊı
+	u8 pid_dataup;	//PIDæ•°æ®æ›´æ–°å‘¨æœŸ pid_dataup*8ms
+  signed   short en=0;		// å½“å‰è¯¯å·®
+  signed   short en1=0;		// ä¸Šæ¬¡è¯¯å·®
+  signed   short en2=0;		// ä¸Šä¸Šæ¬¡è¯¯å·®
+  signed   short now_out=0;	//å½“å‰PIDè¾“å‡º
+  signed   short pre_out;	//ä¸Šä¸€æ¬¡PIDè¾“å‡º	
+  float kp;	//æ¯”ä¾‹ç³»æ•°	
+  float ki;	//ç§¯åˆ†ç³»æ•°
+  float kd;	//å¾®åˆ†ç³»æ•°
 		
 	u16  speed_cntbuffer;   
 	u16  read_speed_rpm;
@@ -28,40 +28,40 @@
 	u8  speed_buffer_cnt_l;
 	u8  speed_buffer_cnt_h;
 
-//-----------------Zero cross ¹ıÁã´¥·¢----------------------------------------------------
- 	u16 power_set=0;						//1-200 (0£¬200)ÌØÊâ´¦Àí
- 	u8 power_l=0;						//1-200 (0£¬200)ÌØÊâ´¦Àí
- 	u8 power_h=0;						//1-200 (0£¬200)ÌØÊâ´¦Àí
- 	u8 trigger_delay_h;					//¶¨Ê±´¥·¢¸ßÎ»¼ÆÊı
- 	u8 trigger_delay_l;					//¶¨Ê±´¥·¢µÍÎ»¼ÆÊı
- 	u8  zc_counter;						//¹ıÁã¼ÆÊı the counter of zero cross
- 	bit en_zc_count_f;								//ÔÊĞí¹ıÁã¼ÆÊıÎ» the flag of counter of zero cross
- 	bit fre_check_ok_f;								//¹¤Æµ¼ì²âOKÎ»£¬1¼ì²â³É¹¦£¬0Î»¼ì²âÊ§°Ü
- 	bit is_50hz_f;									//ÆµÂÊ±êÖ¾Î»1Îª50Hz 0Îª60Hz
- 	bit frist_zc_f;									//µÚÒ»´Î¹ıÁã±êÖ¾£¬0µÚÒ»´Î£¬1Î»¹ıÁãÁË
- 	bit en_fire_f;									//ÔÊĞí´¥·¢¿ª¹Ø±êÖ¾Î»
+//-----------------Zero cross è¿‡é›¶è§¦å‘----------------------------------------------------
+ 	u16 power_set=0;						//1-200 (0ï¼Œ200)ç‰¹æ®Šå¤„ç†
+ 	u8 power_l=0;						//1-200 (0ï¼Œ200)ç‰¹æ®Šå¤„ç†
+ 	u8 power_h=0;						//1-200 (0ï¼Œ200)ç‰¹æ®Šå¤„ç†
+ 	u8 trigger_delay_h;					//å®šæ—¶è§¦å‘é«˜ä½è®¡æ•°
+ 	u8 trigger_delay_l;					//å®šæ—¶è§¦å‘ä½ä½è®¡æ•°
+ 	u8  zc_counter;						//è¿‡é›¶è®¡æ•° the counter of zero cross
+ 	bit en_zc_count_f;								//å…è®¸è¿‡é›¶è®¡æ•°ä½ the flag of counter of zero cross
+ 	bit fre_check_ok_f;								//å·¥é¢‘æ£€æµ‹OKä½ï¼Œ1æ£€æµ‹æˆåŠŸï¼Œ0ä½æ£€æµ‹å¤±è´¥
+ 	bit is_50hz_f;									//é¢‘ç‡æ ‡å¿—ä½1ä¸º50Hz 0ä¸º60Hz
+ 	bit frist_zc_f;									//ç¬¬ä¸€æ¬¡è¿‡é›¶æ ‡å¿—ï¼Œ0ç¬¬ä¸€æ¬¡ï¼Œ1ä½è¿‡é›¶äº†
+ 	bit en_fire_f;									//å…è®¸è§¦å‘å¼€å…³æ ‡å¿—ä½
 
-//-----------------¹¤×÷¼Ä´æÆ÷-----------------------------------------------------------------
- 	_WorkType work_mode;	      	//¹¤×÷Ä£Ê½1
- 	_WorkType old_work_mode;	    //¹¤×÷Ä£Ê½
- 	bit switch_on_f;							//¿ª¹Ø±êÖ¾
- 	bit working_f;								//¿ª¹Ø±êÖ¾
- 	bit en_relay_f;								//¿ª¹Ø±êÖ¾
+//-----------------å·¥ä½œå¯„å­˜å™¨-----------------------------------------------------------------
+ 	_WorkType work_mode;	      	//å·¥ä½œæ¨¡å¼1
+ 	_WorkType old_work_mode;	    //å·¥ä½œæ¨¡å¼
+ 	bit switch_on_f;							//å¼€å…³æ ‡å¿—
+ 	bit working_f;								//å¼€å…³æ ‡å¿—
+ 	bit en_relay_f;								//å¼€å…³æ ‡å¿—
  	bit  soft_run_f;	
-	bit process_10ms_f;	//8msÈÎÎñ±ê¼Ç  the sign of process task
+	bit process_10ms_f;	//8msä»»åŠ¡æ ‡è®°  the sign of process task
 	
 	
 //-----------------action------------------------------------------------------------
- 	u8 work_step_cout;					//¹¤×÷²½CNT
+ 	u8 work_step_cout;					//å·¥ä½œæ­¥CNT
 	u8 protect_cnt; 
- 	u8 work_cout;								//¹¤×÷CNT
- 	u8 job_timer_cnt;						//ÓÃÓÚ¹¤×÷¼ÆÊ±
- 	u8 job_cnt;									//±ÜÃâÁ¬Ëø»Ö¸´ºóÖ±½Ó¿ª»ú¶¯×÷ÓÃµ½ÔÚ¼ÆÊıÆ÷
- 	u8 timer_set;								//¶¨Ê±ÖµÉèÖÃ	
- 	u8 second_cout;							//¶¨Ê±Ãë¼ÆÊı the count of second
- 	u8 count_10ms;								//¶¨Ê±8ms¼ÆÊı the count of 8ms
+ 	u8 work_cout;								//å·¥ä½œCNT
+ 	u8 job_timer_cnt;						//ç”¨äºå·¥ä½œè®¡æ—¶
+ 	u8 job_cnt;									//é¿å…è¿é”æ¢å¤åç›´æ¥å¼€æœºåŠ¨ä½œç”¨åˆ°åœ¨è®¡æ•°å™¨
+ 	u8 timer_set;								//å®šæ—¶å€¼è®¾ç½®	
+ 	u8 second_cout;							//å®šæ—¶ç§’è®¡æ•° the count of second
+ 	u8 count_10ms;								//å®šæ—¶8msè®¡æ•° the count of 8ms
  	 	
- 	u8 ice_step;   							//Ëé±ùÔËĞĞµ½µÚ¼¸²½ crushed ice step
+ 	u8 ice_step;   							//ç¢å†°è¿è¡Œåˆ°ç¬¬å‡ æ­¥ crushed ice step
  	u8 ice_step_cnt; 
  	
  	bit frist_ice_f;
@@ -75,11 +75,11 @@
  	u8 ice_step_recorde_time2;   	
  	bit en_protect_cnt_f;
  	 	
- 	u8 interlock_cnt=0;					//Á¬Ëø¼ÆÊı	the count of interlock
- 	bit interlock_f;								//Á¬Ëø±êÖ¾  the sign of interlock	
- 	bit time_over_f=0;								//¼ÆÊ±Ê±¼äµ½
- 	u8 	 temp_8;						//»º³åÖµ	
- 	u16  temp1_16;  						//ÁÙÊ±Öµ			
+ 	u8 interlock_cnt=0;					//è¿é”è®¡æ•°	the count of interlock
+ 	bit interlock_f;								//è¿é”æ ‡å¿—  the sign of interlock	
+ 	bit time_over_f=0;								//è®¡æ—¶æ—¶é—´åˆ°
+ 	u8 	 temp_8;						//ç¼“å†²å€¼	
+ 	u16  temp1_16;  						//ä¸´æ—¶å€¼			
 	
 	u8 	 off_cnt;						//	
 	
@@ -88,13 +88,13 @@
 
 
 /*-------------------------------------------------------
----º¯ Êı Ãû£º-Pid_Init
----¹¦    ÄÜ£º-pid
----²Î    Êı£º-
----·µ »Ø Öµ£º-
----µ÷    ÓÃ£º-
----Ç°ÌáÌõ¼ş£º-
----Ëµ    Ã÷£º-
+---å‡½ æ•° åï¼š-Pid_Init
+---åŠŸ    èƒ½ï¼š-pid
+---å‚    æ•°ï¼š-
+---è¿” å› å€¼ï¼š-
+---è°ƒ    ç”¨ï¼š-
+---å‰ææ¡ä»¶ï¼š-
+---è¯´    æ˜ï¼š-
 	kp=1.15;
 	ki=0.25;
 	kd=0.36;  
@@ -113,14 +113,14 @@ void Pid_Init(void)
 }
 
 /*-------------------------------------------------------
----º¯ Êı Ãû£º-Pid_Process
----¹¦    ÄÜ£º-pid´¦Àíº¯Êı
----²Î    Êı£º-void 
----·µ »Ø Öµ£º-0-1000 ¹¦ÂÊÖµ
----µ÷    ÓÃ£º-
----Ç°ÌáÌõ¼ş£º-
----Ëµ    Ã÷£º-set_rpm---Éè¶¨Ä¿±êËÙ¶È
-			 -read_speed_rpm---¶ÁÈ¡ËÙ¶È
+---å‡½ æ•° åï¼š-Pid_Process
+---åŠŸ    èƒ½ï¼š-pidå¤„ç†å‡½æ•°
+---å‚    æ•°ï¼š-void 
+---è¿” å› å€¼ï¼š-0-1000 åŠŸç‡å€¼
+---è°ƒ    ç”¨ï¼š-
+---å‰ææ¡ä»¶ï¼š-
+---è¯´    æ˜ï¼š-set_rpm---è®¾å®šç›®æ ‡é€Ÿåº¦
+			 -read_speed_rpm---è¯»å–é€Ÿåº¦
 -------------------------------------------------------*/
 
 u16 Pid_Process(void)
@@ -159,7 +159,7 @@ void Prosess_10ms(void)
 		{	
 			Time_prosess();			
 			process_10ms_f=0;
-			Task_8ms();			//´¥·¢Öµ°´¹¤Æµ×ª»»TCCBÑÓÊ±³õÖµ						
+			Task_8ms();			//è§¦å‘å€¼æŒ‰å·¥é¢‘è½¬æ¢TCCBå»¶æ—¶åˆå€¼						
 			if (work_mode==WORK_OFF)
 				{
 					if(off_cnt<200)
@@ -175,15 +175,15 @@ void Prosess_10ms(void)
 }
 
 //----------------------------------------------------------------------------------------
-// º¯ÊıÃû³Æ£ºtime_prosess(void)
-// º¯Êı¹¦ÄÜ£º
-// Èë¿Úº¯Êı£ºÓÃÈ«¾Ö±äÁ¿
-// ³ö¿Úº¯Êı£ºÈ«¾Ö±äÁ¿
+// å‡½æ•°åç§°ï¼štime_prosess(void)
+// å‡½æ•°åŠŸèƒ½ï¼š
+// å…¥å£å‡½æ•°ï¼šç”¨å…¨å±€å˜é‡
+// å‡ºå£å‡½æ•°ï¼šå…¨å±€å˜é‡
 //----------------------------------------------------------------------------------------	
 
 void Task_8ms(void)  	  
 {		
-//----------¼ÆËãËÙ¶È----------------------------------------------
+//----------è®¡ç®—é€Ÿåº¦----------------------------------------------
 	speed_cntbuffer=speed_buffer_cnt_h;
 	speed_cntbuffer=speed_cntbuffer<<8;
 	speed_cntbuffer+=speed_buffer_cnt_l;	
@@ -198,7 +198,7 @@ void Task_8ms(void)
   {
   	read_speed_rpm=0;
   }
-//-----------------¹¦ÂÊÖµ×ª»»Îª´¥·¢¶¨Ê±³õÖµ-----------------------------------------------
+//-----------------åŠŸç‡å€¼è½¬æ¢ä¸ºè§¦å‘å®šæ—¶åˆå€¼-----------------------------------------------
 	temp1_16=power_set;
 	
 	
@@ -210,7 +210,7 @@ void Task_8ms(void)
 		{
 			temp1_16=0;
 		}
-	power_l=temp1_16;		//Ä¬ÈÏµÍ8Î»¸³Öµ¸øtrigger_delay_l
+	power_l=temp1_16;		//é»˜è®¤ä½8ä½èµ‹å€¼ç»™trigger_delay_l
 	power_h=temp1_16>>8;	
 	if((temp1_16>=1)&&(temp1_16<=1000)) 
 		{
@@ -222,12 +222,12 @@ void Task_8ms(void)
 				{
 					temp1_16=16667-(temp1_16*16);	
 				}
-			trigger_delay_l=temp1_16;		//Ä¬ÈÏµÍ8Î»¸³Öµ¸øtrigger_delay_l
+			trigger_delay_l=temp1_16;		//é»˜è®¤ä½8ä½èµ‹å€¼ç»™trigger_delay_l
 			trigger_delay_h=temp1_16>>8;				
 	}	
 
 	
-//-----------------1-3µµµÄÈíÆô¶¯´¦Àí------------------------------------------------------	
+//-----------------1-3æ¡£çš„è½¯å¯åŠ¨å¤„ç†------------------------------------------------------	
 	if (soft_run_f&&en_fire_f&&switch_on_f) 
 	{
 		if (soft_run_f) 
@@ -268,11 +268,11 @@ void Task_8ms(void)
 			set_rpm=0;
 			trigger_out_p=0;
 		}
-//-------------------------PID´¦Àí--------------------------------------------------------	    
+//-------------------------PIDå¤„ç†--------------------------------------------------------	    
 	if(set_rpm!=0)
 		{
 			pid_dataup++;
-			if (pid_dataup>=PID_DATAUPTIME) //½øÈëPID¸üĞÂÒªÊ±¼ä¼ÆÊıÒç³ö
+			if (pid_dataup>=PID_DATAUPTIME) //è¿›å…¥PIDæ›´æ–°è¦æ—¶é—´è®¡æ•°æº¢å‡º
 		   	{
 		   		pid_dataup=0;
 		   		power_set=Pid_Process();		   						   									   						   					   		 
@@ -283,7 +283,7 @@ void Task_8ms(void)
 			if(read_speed_rpm > 20)//1000RPM
 				{
 					pid_dataup++;
-					if (pid_dataup>=PID_DATAUPTIME) //½øÈëPID¸üĞÂÒªÊ±¼ä¼ÆÊıÒç³ö
+					if (pid_dataup>=PID_DATAUPTIME) //è¿›å…¥PIDæ›´æ–°è¦æ—¶é—´è®¡æ•°æº¢å‡º
 				   	{
 				   		pid_dataup=0;
 				   		temp1_16=Pid_Process();		   						   									   						   					   		 
@@ -300,15 +300,15 @@ void Task_8ms(void)
 }
 
 //----------------------------------------------------------------------------------------
-// º¯ÊıÃû³Æ£ºtime_prosess(void)
-// º¯Êı¹¦ÄÜ£º
-// Èë¿Úº¯Êı£ºÓÃÈ«¾Ö±äÁ¿
-// ³ö¿Úº¯Êı£ºÈ«¾Ö±äÁ¿
+// å‡½æ•°åç§°ï¼štime_prosess(void)
+// å‡½æ•°åŠŸèƒ½ï¼š
+// å…¥å£å‡½æ•°ï¼šç”¨å…¨å±€å˜é‡
+// å‡ºå£å‡½æ•°ï¼šå…¨å±€å˜é‡
 //----------------------------------------------------------------------------------------	
 
 void Time_prosess(void)
 {				
-	if (second_cout>=125) //Ãë¼ÆÊ±£¬8ms*125=1s
+	if (second_cout>=125) //ç§’è®¡æ—¶ï¼Œ8ms*125=1s
 		{
 			second_cout=0;		    					  
 			if(working_f)
@@ -340,10 +340,10 @@ void Time_prosess(void)
 }
 
 //----------------------------------------------------------------------------------------
-// º¯ÊıÃû³Æ£ºScan_Key(void)
-// º¯Êı¹¦ÄÜ£º
-// Èë¿Úº¯Êı£º
-// ³ö¿Úº¯Êı£º
+// å‡½æ•°åç§°ï¼šScan_Key(void)
+// å‡½æ•°åŠŸèƒ½ï¼š
+// å…¥å£å‡½æ•°ï¼š
+// å‡ºå£å‡½æ•°ï¼š
 //----------------------------------------------------------------------------------------
 
 _KEY_Type Scan_Key(void)
@@ -373,10 +373,10 @@ _KEY_Type Scan_Key(void)
 
 }
 //----------------------------------------------------------------------------------------
-// º¯ÊıÃû³Æ£º
-// º¯Êı¹¦ÄÜ£º
-// Èë¿Úº¯Êı£º
-// ³ö¿Úº¯Êı£º
+// å‡½æ•°åç§°ï¼š
+// å‡½æ•°åŠŸèƒ½ï¼š
+// å…¥å£å‡½æ•°ï¼š
+// å‡ºå£å‡½æ•°ï¼š
 //----------------------------------------------------------------------------------------
 	
 void Scan_task(void)
@@ -406,7 +406,7 @@ void Scan_task(void)
 				}			
 		}	
 					
-	if (key_value==KEY_ICE) 			//Ëé±ùÄ£Ê½
+	if (key_value==KEY_ICE) 			//ç¢å†°æ¨¡å¼
 			{
 				if ((!time_over_f)&&(work_mode!=WORK_LOSTLOCK)&&(work_mode!=WORK_PROTECT))
 					{
@@ -414,7 +414,7 @@ void Scan_task(void)
 						switch_on_f=1;									
 					}											
 			}
-	else if (key_value==KEY_NULL)	//´ı»úÄ£Ê½
+	else if (key_value==KEY_NULL)	//å¾…æœºæ¨¡å¼
 			{		
 			if((work_mode!=WORK_PROTECT)&&(work_mode != WORK_READY))	
 				{
@@ -429,7 +429,7 @@ void Scan_task(void)
 					}
 				}
 			}
-	else if (key_value==KEY_SPEED1) //½Á°èËÙ¶È1Ä£Ê½
+	else if (key_value==KEY_SPEED1) //æ…æ‹Œé€Ÿåº¦1æ¨¡å¼
 			{
 				if ((!time_over_f)&&(work_mode!=WORK_LOSTLOCK)&&(work_mode!=WORK_PROTECT))
 					{
@@ -441,7 +441,7 @@ void Scan_task(void)
 						old_work_mode=WORK_SPEED1;
 					}								
 			}
-	else if (key_value==KEY_SPEED2)//½Á°èËÙ¶È2Ä£Ê½
+	else if (key_value==KEY_SPEED2)//æ…æ‹Œé€Ÿåº¦2æ¨¡å¼
 			{
 
 				if ((!time_over_f)&&(work_mode!=WORK_LOSTLOCK)&&(work_mode!=WORK_PROTECT))
@@ -460,10 +460,10 @@ void Scan_task(void)
 
 
 //----------------------------------------------------------------------------------------
-// º¯ÊıÃû³Æ£ºwork_mode_control(void)
-// º¯Êı¹¦ÄÜ£º
-// Èë¿Úº¯Êı£º
-// ³ö¿Úº¯Êı£º
+// å‡½æ•°åç§°ï¼šwork_mode_control(void)
+// å‡½æ•°åŠŸèƒ½ï¼š
+// å…¥å£å‡½æ•°ï¼š
+// å‡ºå£å‡½æ•°ï¼š
 //----------------------------------------------------------------------------------------
 	
 void Over_LoadDetection(void)
@@ -505,19 +505,19 @@ void Over_LoadDetection(void)
 
 
 //----------------------------------------------------------------------------------------
-// º¯ÊıÃû³Æ£ºwork_mode_control(void)
-// º¯Êı¹¦ÄÜ£º
-// Èë¿Úº¯Êı£º
-// ³ö¿Úº¯Êı£º
+// å‡½æ•°åç§°ï¼šwork_mode_control(void)
+// å‡½æ•°åŠŸèƒ½ï¼š
+// å…¥å£å‡½æ•°ï¼š
+// å‡ºå£å‡½æ•°ï¼š
 //----------------------------------------------------------------------------------------
 	
 void Control_task(void)
 {
 	
-//----------------------¼ÆÊ±²Ù×÷----------------------------------------------------------
+//----------------------è®¡æ—¶æ“ä½œ----------------------------------------------------------
 	if (working_f) 
 		{
-			if (job_timer_cnt>=timer_set) 	//Èç¹ûÊ±¼äµ½ÁËÍ£»ú
+			if (job_timer_cnt>=timer_set) 	//å¦‚æœæ—¶é—´åˆ°äº†åœæœº
 				{
 					job_timer_cnt=0;
 					time_over_f=1;
@@ -525,18 +525,18 @@ void Control_task(void)
 				}	
 		}	
 		
-//-------------Ê§È¥Á¬Ëø²Ù×÷---------------------------------------------------------------
-	if ((interlock_f==0)&&working_f&&(job_cnt>=1)) //40ms Ê§È¥Á¬Ëø£¬Èí¼şÍ£»ú
+//-------------å¤±å»è¿é”æ“ä½œ---------------------------------------------------------------
+	if ((interlock_f==0)&&working_f&&(job_cnt>=1)) //40ms å¤±å»è¿é”ï¼Œè½¯ä»¶åœæœº
 		{
-			//	switch_on_f=0;			//¹Ø»ú
-			//	time_over_f=1;			//Ğè¸´Î»µ½0ffÎ»ÖÃ²Å¿ÉÖØĞÂ¿ª»ú±ÜÃâÁ¬Ëø»Ö¸´ºóÖ±½Ó¿ª»ú¶¯×÷
+			//	switch_on_f=0;			//å…³æœº
+			//	time_over_f=1;			//éœ€å¤ä½åˆ°0ffä½ç½®æ‰å¯é‡æ–°å¼€æœºé¿å…è¿é”æ¢å¤åç›´æ¥å¼€æœºåŠ¨ä½œ
 		}	
-	if (working_f) //40ms Ê§È¥Á¬Ëø£¬Èí¼şÍ£»ú
+	if (working_f) //40ms å¤±å»è¿é”ï¼Œè½¯ä»¶åœæœº
 		{
 			if(hall_b_p||hall_a_p)
 			{				
-				switch_on_f=0;			//¹Ø»ú
-				time_over_f=1;			//Ğè¸´Î»µ½0ffÎ»ÖÃ²Å¿ÉÖØĞÂ¿ª»ú±ÜÃâÁ¬Ëø»Ö¸´ºóÖ±½Ó¿ª»ú¶¯×÷
+				switch_on_f=0;			//å…³æœº
+				time_over_f=1;			//éœ€å¤ä½åˆ°0ffä½ç½®æ‰å¯é‡æ–°å¼€æœºé¿å…è¿é”æ¢å¤åç›´æ¥å¼€æœºåŠ¨ä½œ
 				work_mode=WORK_OFF;
 			}		
 		}			
@@ -554,8 +554,8 @@ void Control_task(void)
 			set_rpm_buffer=0;
 			set_rpm=0;
 			
-			job_timer_cnt=0;				//¼ÆÊ±Çå0
-			ice_step=0;						//´Ó0¿ªÊ¼¹¤×÷
+			job_timer_cnt=0;				//è®¡æ—¶æ¸…0
+			ice_step=0;						//ä»0å¼€å§‹å·¥ä½œ
 			soft_run_f=0;
 			ice_step_cnt=0;
 			
@@ -573,14 +573,14 @@ void Control_task(void)
 				set_rpm_buffer=0;
 				set_rpm=0;
 		}
-	else if (work_mode==WORK_IEC) //Ëé±ù
+	else if (work_mode==WORK_IEC) //ç¢å†°
 		{		
 			if (working_f==0) 
 				{
-					working_f=1;				//ÖÃ¹¤×÷±êÖ¾Î»
-					timer_set=TIME_SPEED_CONTROL_MODE;//¸³¹¤×÷Ê±³¤ÖÃÓë¼ÆÊ±¹¤×÷¼Ä´æÆ÷
-					job_timer_cnt=0;				//¼ÆÊ±Çå0
-					ice_step=0;						//´Ó0¿ªÊ¼¹¤×÷
+					working_f=1;				//ç½®å·¥ä½œæ ‡å¿—ä½
+					timer_set=TIME_SPEED_CONTROL_MODE;//èµ‹å·¥ä½œæ—¶é•¿ç½®ä¸è®¡æ—¶å·¥ä½œå¯„å­˜å™¨
+					job_timer_cnt=0;				//è®¡æ—¶æ¸…0
+					ice_step=0;						//ä»0å¼€å§‹å·¥ä½œ
 					soft_run_f=0;
 					ice_step_cnt=0;
 				}
@@ -636,8 +636,8 @@ void Control_task(void)
 									if((ice_recog_cnt > 7)&&(ice_recog_cnt1 > 5))
 									{
 										ice_recog_cnt=0;
-										switch_on_f=0;			//¹Ø»ú
-										time_over_f=1;			//Ğè¸´Î»µ½0ffÎ»ÖÃ²Å¿ÉÖØĞÂ¿ª»ú±ÜÃâÁ¬Ëø»Ö¸´ºóÖ±½Ó¿ª»ú¶¯×÷
+										switch_on_f=0;			//å…³æœº
+										time_over_f=1;			//éœ€å¤ä½åˆ°0ffä½ç½®æ‰å¯é‡æ–°å¼€æœºé¿å…è¿é”æ¢å¤åç›´æ¥å¼€æœºåŠ¨ä½œ
 										ice_step_time=0;
 										ice_step_recorde_time1=0;
 										ice_step_recorde_time2=0;
@@ -669,15 +669,15 @@ void Control_task(void)
 					
 				}
 		}
-	else if (work_mode==WORK_SPEED1) //µ÷ËÙ1
+	else if (work_mode==WORK_SPEED1) //è°ƒé€Ÿ1
 		{	
 			if(switch_on_f)
 			{
 				if (working_f==0) 
 				{
-					working_f=1;				//ÖÃ¹¤×÷±êÖ¾Î»
-					timer_set=TIME_SPEED_CONTROL_MODE;//¸³¹¤×÷Ê±³¤ÖÃÓë¼ÆÊ±¹¤×÷¼Ä´æÆ÷
-					job_timer_cnt=0;				//¼ÆÊ±Çå0
+					working_f=1;				//ç½®å·¥ä½œæ ‡å¿—ä½
+					timer_set=TIME_SPEED_CONTROL_MODE;//èµ‹å·¥ä½œæ—¶é•¿ç½®ä¸è®¡æ—¶å·¥ä½œå¯„å­˜å™¨
+					job_timer_cnt=0;				//è®¡æ—¶æ¸…0
 					soft_run_f=1;
 					en_relay_f=1;
 				}	
@@ -689,16 +689,16 @@ void Control_task(void)
 			}
 
 		}
-	else if (work_mode==WORK_SPEED2) //µ÷ËÙ2
+	else if (work_mode==WORK_SPEED2) //è°ƒé€Ÿ2
 		{	
 			if(switch_on_f)
 			{
 				if (working_f==0) 
 				{
-					working_f=1;				//ÖÃ¹¤×÷±êÖ¾Î»
-					timer_set=TIME_SPEED_CONTROL_MODE;//¸³¹¤×÷Ê±³¤ÖÃÓë¼ÆÊ±¹¤×÷¼Ä´æÆ÷
-					job_timer_cnt=0;				//¼ÆÊ±Çå0
-					ice_step=0;						//´Ó0¿ªÊ¼¹¤×÷
+					working_f=1;				//ç½®å·¥ä½œæ ‡å¿—ä½
+					timer_set=TIME_SPEED_CONTROL_MODE;//èµ‹å·¥ä½œæ—¶é•¿ç½®ä¸è®¡æ—¶å·¥ä½œå¯„å­˜å™¨
+					job_timer_cnt=0;				//è®¡æ—¶æ¸…0
+					ice_step=0;						//ä»0å¼€å§‹å·¥ä½œ
 					soft_run_f=1;
 					en_relay_f=1;
 				}	
